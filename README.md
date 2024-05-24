@@ -4,6 +4,9 @@
 
 This plugin allows you to replace unnecessary words or phrases with symbols inside of your editor, without losing the functionality of the code. The plugin advocates for **readability** and puts the configuration in the hands of the users. Any word or phrase can be converted into a symbol or left blank to abstract away excess bloat and allows your eyes to focus on the important parts of the code. 
 
+## Installation
+
+You can either install the extension through the VSCode Marketplace, or you can install the syntax-tract/syntax-tract-0.0.3.vsix file by clicking 'Install from VSIX'.
 
 ## Requirements
 
