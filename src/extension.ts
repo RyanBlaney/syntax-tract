@@ -26,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
     const lang = doc.languageId;
     const settings = languages[lang];
     if (!settings) {
-      // If the language is not configured, clear any existing decorations and return
       if (decorationType) {
         editor.setDecorations(decorationType, []);
         decorationType.dispose();
