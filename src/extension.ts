@@ -30,20 +30,27 @@ export function activate(context: vscode.ExtensionContext) {
       const color = settings.color || '#ff0000';
       const decorationType = vscode.window.createTextEditorDecorationType({
         color: color,
-        textDecoration: 'none; display: none;', // This hides the text
+        textDecoration: 'none; display: none', 
       });
 
       const decorations: vscode.DecorationOptions[] = [];
 
       for (const [word, symbol] of Object.entries(words)) {
-        const regex = new RegExp(word, 'g');
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters in word
+        const regex = new RegExp(escapedWord, 'g');
         for (let i = 0; i < doc.lineCount; i++) {
           const line = doc.lineAt(i);
           let match;
           while ((match = regex.exec(line.text)) !== null) {
             const startPos = new vscode.Position(i, match.index);
             const endPos = new vscode.Position(i, match.index + match[0].length);
-            const decoration = { range: new vscode.Range(startPos, endPos), renderOptions: { after: { contentText: symbol } } };
+            const decoration = {
+              range: new vscode.Range(startPos, endPos),
+              renderOptions: {
+                after: { contentText: symbol, color: color },
+                before: { contentText: '', textDecoration: 'none; display: none;' }
+              }
+            };
             decorations.push(decoration);
           }
         }
@@ -53,6 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       // Clear decorations on the current line
       const clearDecorations = () => {
+        if (!editor) return;
         const currentLine = editor.selection.active.line;
         const lineRange = new vscode.Range(currentLine, 0, currentLine, doc.lineAt(currentLine).text.length);
         editor.setDecorations(decorationType, decorations.filter(d => !lineRange.contains(d.range.start)));
