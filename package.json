@@ -2,7 +2,11 @@
   "name": "syntax-tract",
   "displayName": "syntax-tract",
   "description": "A vscode extension to make your code more readable by abstracting certain keywords that are unnecessary and replacing them with an appropriate symbol.",
-  "version": "0.0.1",
+  "version": "0.0.3",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/RyanBlaney/syntax-tract.git"
+    },
   "engines": {
     "vscode": "^1.89.0"
   },
