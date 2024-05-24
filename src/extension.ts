@@ -5,11 +5,9 @@ interface LanguageSettings {
   color: string;
 }
 
-interface Configuration {
-  languages: { [key: string]: LanguageSettings };
-}
-
 let decorationType: vscode.TextEditorDecorationType | undefined;
+let currentEditor: vscode.TextEditor | undefined;
+let selectionChangeListener: vscode.Disposable | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('Syntax Tract extension is activated');
@@ -22,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
   const updateDecorations = (editor: vscode.TextEditor | undefined) => {
     if (!editor || !editor.document) return;
     const doc = editor.document;
+
     console.log('Updating decorations for:', doc.fileName);
 
     const lang = doc.languageId;
@@ -82,11 +81,24 @@ export function activate(context: vscode.ExtensionContext) {
       editor.setDecorations(decorationType, decorations.filter(d => !lineRange.contains(d.range.start)));
     };
 
-    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(clearDecorations));
+    // Remove previous listener
+    if (selectionChangeListener) {
+      selectionChangeListener.dispose();
+    }
+
+    selectionChangeListener = vscode.window.onDidChangeTextEditorSelection(clearDecorations);
+    context.subscriptions.push(selectionChangeListener);
     clearDecorations();
   };
 
-  vscode.window.onDidChangeActiveTextEditor(updateDecorations, null, context.subscriptions);
+  const handleEditorChange = (editor: vscode.TextEditor | undefined) => {
+    if (currentEditor !== editor) {
+      currentEditor = editor;
+      updateDecorations(editor);
+    }
+  };
+
+  vscode.window.onDidChangeActiveTextEditor(handleEditorChange, null, context.subscriptions);
   vscode.workspace.onDidChangeTextDocument((event) => {
     if (vscode.window.activeTextEditor && event.document === vscode.window.activeTextEditor.document) {
       updateDecorations(vscode.window.activeTextEditor);
@@ -102,5 +114,8 @@ export function deactivate() {
   console.log('Syntax Tract extension is deactivated');
   if (decorationType) {
     decorationType.dispose();
+  }
+  if (selectionChangeListener) {
+    selectionChangeListener.dispose();
   }
 }
