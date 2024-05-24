@@ -9,7 +9,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": ["*"],  
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -30,7 +30,7 @@
             }
           },
           "patternProperties": {
-            "^[a-zA-Z]+$": {  
+            "^[a-zA-Z]+$": {
               "type": "object",
               "description": "Settings for a specific language",
               "properties": {
@@ -44,7 +44,7 @@
                 "color": {
                   "type": "string",
                   "description": "Color for the replaced words",
-                  "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"  
+                  "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
                 }
               }
             }

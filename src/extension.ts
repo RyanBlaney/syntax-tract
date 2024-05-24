@@ -1,39 +1,65 @@
 import * as vscode from 'vscode';
 
+interface LanguageSettings {
+  words: { [key: string]: string };
+  color: string;
+}
+
+interface Configuration {
+  languages: { [key: string]: LanguageSettings };
+}
+
 export function activate(context: vscode.ExtensionContext) {
+  console.log('Syntax Tract extension is activated');
+
   const config = vscode.workspace.getConfiguration('syntaxTract');
-  const languages = config.get('languages') || {};
+  const languages: { [key: string]: LanguageSettings } = config.get('languages') || {};
+
+  console.log('Loaded languages configuration:', languages);
 
   const updateDecorations = (editor: vscode.TextEditor | undefined) => {
     if (!editor) return;
     const doc = editor.document;
+    console.log('Updating decorations for:', doc.fileName);
 
-    for (const [lang, settings] of Object.entries(languages)) {
-      if (doc.languageId === lang) {
-        const words = settings.words || {};
-        const color = settings.color || '#ff0000';
-        const decorationType = vscode.window.createTextEditorDecorationType({
-          color: color,
-        });
+    const lang = doc.languageId;
+    const settings = languages[lang];
+    if (settings) {
+      console.log(`Applying settings for language: ${lang}`);
+      const words = settings.words || {};
+      const color = settings.color || '#ff0000';
+      const decorationType = vscode.window.createTextEditorDecorationType({
+        color: color,
+        textDecoration: 'none; display: none;', // This hides the text
+      });
 
-        const decorations: vscode.DecorationOptions[] = [];
+      const decorations: vscode.DecorationOptions[] = [];
 
-        for (const [word, symbol] of Object.entries(words)) {
-          const regex = new RegExp(word, 'g');
-          for (let i = 0; i < doc.lineCount; i++) {
-            const line = doc.lineAt(i);
-            let match;
-            while ((match = regex.exec(line.text)) !== null) {
-              const startPos = new vscode.Position(i, match.index);
-              const endPos = new vscode.Position(i, match.index + match[0].length);
-              const decoration = { range: new vscode.Range(startPos, endPos), renderOptions: { after: { contentText: symbol as string } } };
-              decorations.push(decoration);
-            }
+      for (const [word, symbol] of Object.entries(words)) {
+        const regex = new RegExp(word, 'g');
+        for (let i = 0; i < doc.lineCount; i++) {
+          const line = doc.lineAt(i);
+          let match;
+          while ((match = regex.exec(line.text)) !== null) {
+            const startPos = new vscode.Position(i, match.index);
+            const endPos = new vscode.Position(i, match.index + match[0].length);
+            const decoration = { range: new vscode.Range(startPos, endPos), renderOptions: { after: { contentText: symbol } } };
+            decorations.push(decoration);
           }
         }
-
-        editor.setDecorations(decorationType, decorations);
       }
+
+      editor.setDecorations(decorationType, decorations);
+
+      // Clear decorations on the current line
+      const clearDecorations = () => {
+        const currentLine = editor.selection.active.line;
+        const lineRange = new vscode.Range(currentLine, 0, currentLine, doc.lineAt(currentLine).text.length);
+        editor.setDecorations(decorationType, decorations.filter(d => !lineRange.contains(d.range.start)));
+      };
+
+      context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(clearDecorations));
+      clearDecorations();
     }
   };
 
@@ -49,4 +75,6 @@ export function activate(context: vscode.ExtensionContext) {
   }
 }
 
-export function deactivate() {}
+export function deactivate() {
+  console.log('Syntax Tract extension is deactivated');
+}
