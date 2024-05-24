@@ -9,6 +9,8 @@ interface Configuration {
   languages: { [key: string]: LanguageSettings };
 }
 
+let decorationType: vscode.TextEditorDecorationType;
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('Syntax Tract extension is activated');
 
@@ -28,9 +30,14 @@ export function activate(context: vscode.ExtensionContext) {
       console.log(`Applying settings for language: ${lang}`);
       const words = settings.words || {};
       const color = settings.color || '#ff0000';
-      const decorationType = vscode.window.createTextEditorDecorationType({
+
+      if (decorationType) {
+        decorationType.dispose();
+      }
+
+      decorationType = vscode.window.createTextEditorDecorationType({
         color: color,
-        textDecoration: 'none; display: none', 
+        textDecoration: 'none; display: none', // This hides the text
       });
 
       const decorations: vscode.DecorationOptions[] = [];
@@ -85,4 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   console.log('Syntax Tract extension is deactivated');
+  if (decorationType) {
+    decorationType.dispose();
+  }
 }
