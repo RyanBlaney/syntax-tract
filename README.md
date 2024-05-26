@@ -71,7 +71,7 @@ characters, '\',  I'm using a double '\\' for the new line.
                 "static_cast<std::wstring>": "⚙"
         },
         "color": "#ff8a8a"
-        "hideBraces:" true --> this is to hide {} when you are outside of the scope
+        "hideBraces:" true -- this is to hide {} when you are outside of the scope 
     },
     -- Add languages/file-types here  
 },
