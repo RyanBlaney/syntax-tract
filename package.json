@@ -2,7 +2,7 @@
   "name": "syntax-tract",
   "displayName": "syntax-tract",
   "description": "A vscode extension to make your code more readable by abstracting certain keywords that are unnecessary and replacing them with an appropriate symbol.",
-  "version": "0.0.3",
+  "version": "0.0.4",
    "repository": {
       "type": "git",
       "url": "https://github.com/RyanBlaney/syntax-tract.git"
@@ -74,7 +74,8 @@
                 "static_cast<std::string>": "⚙",
                 "static_cast<std::wstring>": "⚙"
               },
-              "color": "#ff8a8a"
+              "color": "#ff8a8a",
+              "hideBraces": true
             }
           },
           "patternProperties": {
@@ -93,6 +94,11 @@
                   "type": "string",
                   "description": "Color for the replaced words",
                   "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$"
+                },
+                "hideBraces": {
+                  "type": "boolean",
+                  "description": "Hide braces {} when the cursor is outside of the scope",
+                  "default": false
                 }
               }
             }
